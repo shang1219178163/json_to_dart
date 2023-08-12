@@ -20,3 +20,6 @@ This library is designed to generate Flutter friendly model classes following th
 ```json
 [{ "thisSupported": [{ "cool": true }] }]
 ```
+
+## Change Log
+2023-08-12：update to v3.7.0；
