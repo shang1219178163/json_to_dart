@@ -14,10 +14,10 @@ String _scriptPath() {
 }
 
 main() {
-  final classGenerator = new ModelGenerator('Sample');
+  final classGenerator = ModelGenerator('Sample');
   final currentDirectory = dirname(_scriptPath());
   final filePath = normalize(join(currentDirectory, 'sample.json'));
-  final jsonRawData = new File(filePath).readAsStringSync();
+  final jsonRawData = File(filePath).readAsStringSync();
   DartCode dartCode = classGenerator.generateDartClasses(jsonRawData);
   print(dartCode.code);
 }
