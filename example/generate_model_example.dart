@@ -1,6 +1,7 @@
 import 'dart:io';
+import 'package:json_to_dart/model_generator.dart';
 import "package:path/path.dart" show dirname, join, normalize;
-import '../lib/json_to_dart.dart';
+
 
 String _scriptPath() {
   var script = Platform.script.toString();
