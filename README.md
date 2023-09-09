@@ -22,4 +22,6 @@ This library is designed to generate Flutter friendly model classes following th
 ```
 
 ## Change Log
+2023-09-09：fix bug；
+
 2023-08-12：update to v3.7.0；
