@@ -44,17 +44,25 @@ class ModelGenerator {
   }
 
   List<Warning> _generateClassDefinition(String className,
-      dynamic jsonRawDynamicData, String path, Node? astNode) {
+      dynamic jsonRawDynamicData, String path, Node? astNode,
+      {String classPrefix = "", String classSuffix = ""}) {
+    if (!className.startsWith(classPrefix)) {
+      className = classPrefix + className;
+    }
+    if (!className.endsWith(classSuffix)) {
+      className += classSuffix;
+    }
+
     List<Warning> warnings = <Warning>[];
     if (jsonRawDynamicData is List) {
       // if first element is an array, start in the first element.
       final node = navigateNode(astNode, '0');
-      _generateClassDefinition(className, jsonRawDynamicData[0], path, node!);
+      _generateClassDefinition(className, jsonRawDynamicData[0], path, node!,
+          classPrefix: classPrefix, classSuffix: classSuffix);
     } else {
       final Map<dynamic, dynamic> jsonRawData = jsonRawDynamicData;
       final keys = jsonRawData.keys;
-      ClassDefinition classDefinition =
-          ClassDefinition(className, _privateFields);
+      final classDefinition = ClassDefinition(className, _privateFields);
       keys.forEach((key) {
         TypeDefinition typeDef;
         final hint = _hintForPath('$path/$key');
@@ -106,12 +114,15 @@ class ModelGenerator {
             }
             final node = navigateNode(astNode, dependency.name);
             warns = _generateClassDefinition(dependency.className, toAnalyze,
-                '$path/${dependency.name}', node);
+                '$path/${dependency.name}', node,
+                classPrefix: classPrefix, classSuffix: classSuffix);
           }
         } else {
           final node = navigateNode(astNode, dependency.name);
           warns = _generateClassDefinition(dependency.className,
-              jsonRawData[dependency.name], '$path/${dependency.name}', node);
+              jsonRawData[dependency.name], '$path/${dependency.name}', node,
+              classPrefix: classPrefix, classSuffix: classSuffix,
+          );
         }
         warnings.addAll(warns);
       });
@@ -123,11 +134,12 @@ class ModelGenerator {
   /// in a single string. The [rawJson] param is assumed to be a properly
   /// formatted JSON string. The dart code is not validated so invalid dart code
   /// might be returned
-  DartCode generateUnsafeDart(String rawJson) {
+  DartCode generateUnsafeDart(String rawJson, {String classPrefix = "", String classSuffix = ""}) {
     final jsonRawData = decodeJSON(rawJson);
     final astNode = parse(rawJson, Settings());
     List<Warning> warnings =
-        _generateClassDefinition(_rootClassName, jsonRawData, "", astNode);
+        _generateClassDefinition(_rootClassName, jsonRawData, "", astNode,
+            classPrefix: classPrefix, classSuffix: classSuffix);
     // after generating all classes, replace the omited similar classes.
     allClasses.forEach((c) {
       final fieldsKeys = c.fields.keys;
@@ -147,8 +159,8 @@ class ModelGenerator {
   /// generateDartClasses will generate all classes and append one after another
   /// in a single string. The [rawJson] param is assumed to be a properly
   /// formatted JSON string. If the generated dart is invalid it will throw an error.
-  DartCode generateDartClasses(String rawJson) {
-    final unsafeDartCode = generateUnsafeDart(rawJson);
+  DartCode generateDartClasses(String rawJson, {String classPrefix = "", String classSuffix = ""}) {
+    final unsafeDartCode = generateUnsafeDart(rawJson, classPrefix: classPrefix, classSuffix: classSuffix);
     final formatter = DartFormatter();
     return DartCode(
         formatter.format(unsafeDartCode.code), unsafeDartCode.warnings);

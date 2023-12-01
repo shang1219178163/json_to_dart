@@ -18,7 +18,11 @@ main() {
   final classGenerator = ModelGenerator('Sample');
   final currentDirectory = dirname(_scriptPath());
   final filePath = normalize(join(currentDirectory, 'sample.json'));
+  print("currentDirectory: $currentDirectory");
+  print("filePath: $filePath");
   final jsonRawData = File(filePath).readAsStringSync();
-  DartCode dartCode = classGenerator.generateDartClasses(jsonRawData);
+  DartCode dartCode = classGenerator.generateDartClasses(jsonRawData,
+    classPrefix: "YY", classSuffix: "Model",
+  );
   print(dartCode.code);
 }
