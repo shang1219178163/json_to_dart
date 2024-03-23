@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'package:dart_style/dart_style.dart';
 import 'package:json_ast/json_ast.dart' show parse, Settings, Node;
 import 'package:json_to_dart/helpers.dart';
+import 'package:json_to_dart/string_ext.dart';
 import 'package:json_to_dart/syntax.dart';
 
 class DartCode extends WithWarning<String> {
@@ -45,24 +46,24 @@ class ModelGenerator {
 
   List<Warning> _generateClassDefinition(String className,
       dynamic jsonRawDynamicData, String path, Node? astNode,
-      {String classPrefix = "", String classSuffix = ""}) {
-    if (!className.startsWith(classPrefix)) {
-      className = classPrefix + className;
-    }
-    if (!className.endsWith(classSuffix)) {
-      className += classSuffix;
-    }
+      {String prefix = "", String suffix = ""}) {
 
     List<Warning> warnings = <Warning>[];
     if (jsonRawDynamicData is List) {
       // if first element is an array, start in the first element.
       final node = navigateNode(astNode, '0');
       _generateClassDefinition(className, jsonRawDynamicData[0], path, node!,
-          classPrefix: classPrefix, classSuffix: classSuffix);
+          prefix: prefix, suffix: suffix);
     } else {
       final Map<dynamic, dynamic> jsonRawData = jsonRawDynamicData;
       final keys = jsonRawData.keys;
-      final classDefinition = ClassDefinition(className, _privateFields);
+      final classDefinition = ClassDefinition(
+        // name: className,
+        name: "$prefix$className$suffix",
+        privateFields: _privateFields,
+        prefix: prefix,
+        suffix: suffix,
+      );
       keys.forEach((key) {
         TypeDefinition typeDef;
         final hint = _hintForPath('$path/$key');
@@ -74,12 +75,23 @@ class ModelGenerator {
         }
         if (typeDef.name == 'Class') {
           typeDef.name = camelCase(key);
+          typeDef.name = typeDef.name.padding(
+              prefix: prefix,
+              suffix: suffix,
+          );
+          // print("typeDef.name:${typeDef.name}");
         }
         if (typeDef.name == 'List' && typeDef.subtype == 'Null') {
           warnings.add(newEmptyListWarn('$path/$key'));
         }
         if (typeDef.subtype != null && typeDef.subtype == 'Class') {
           typeDef.subtype = camelCase(key);
+          // print("typeDef.subtype:${typeDef.subtype}");
+          typeDef.subtype = (typeDef.subtype ?? "").padding(
+            prefix: prefix,
+            suffix: suffix,
+          );
+          // print("typeDef.subtype2:${typeDef.subtype}");
         }
         if (typeDef.isAmbiguous) {
           warnings.add(newAmbiguousListWarn('$path/$key'));
@@ -87,7 +99,7 @@ class ModelGenerator {
         classDefinition.addField(key, typeDef);
       });
       final similarClass = allClasses.firstWhere((cd) => cd == classDefinition,
-          orElse: () => ClassDefinition(""));
+          orElse: () => ClassDefinition(name: ""));
       if (similarClass.name != "") {
         final similarClassName = similarClass.name;
         final currentClassName = classDefinition.name;
@@ -115,13 +127,15 @@ class ModelGenerator {
             final node = navigateNode(astNode, dependency.name);
             warns = _generateClassDefinition(dependency.className, toAnalyze,
                 '$path/${dependency.name}', node,
-                classPrefix: classPrefix, classSuffix: classSuffix);
+                prefix: prefix,
+                suffix: suffix,
+            );
           }
         } else {
           final node = navigateNode(astNode, dependency.name);
           warns = _generateClassDefinition(dependency.className,
               jsonRawData[dependency.name], '$path/${dependency.name}', node,
-              classPrefix: classPrefix, classSuffix: classSuffix,
+              prefix: prefix, suffix: suffix,
           );
         }
         warnings.addAll(warns);
@@ -139,7 +153,7 @@ class ModelGenerator {
     final astNode = parse(rawJson, Settings());
     List<Warning> warnings =
         _generateClassDefinition(_rootClassName, jsonRawData, "", astNode,
-            classPrefix: classPrefix, classSuffix: classSuffix);
+            prefix: classPrefix, suffix: classSuffix);
     // after generating all classes, replace the omited similar classes.
     allClasses.forEach((c) {
       final fieldsKeys = c.fields.keys;

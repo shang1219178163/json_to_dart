@@ -15,14 +15,21 @@ String _scriptPath() {
 }
 
 main() {
-  final classGenerator = ModelGenerator('Sample');
+  var rootClassName = 'Sample';
+  var jsonFile = 'sample.json';
+
+  // rootClassName = 'AppDetail';
+  // jsonFile = 'appInfo.json';
+
+  final classGenerator = ModelGenerator(rootClassName);
   final currentDirectory = dirname(_scriptPath());
-  final filePath = normalize(join(currentDirectory, 'sample.json'));
+  final filePath = normalize(join(currentDirectory, jsonFile));
   print("currentDirectory: $currentDirectory");
   print("filePath: $filePath");
   final jsonRawData = File(filePath).readAsStringSync();
   DartCode dartCode = classGenerator.generateDartClasses(jsonRawData,
     classPrefix: "YY", classSuffix: "Model",
   );
+  print("\n");
   print(dartCode.code);
 }
