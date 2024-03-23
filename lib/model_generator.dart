@@ -36,7 +36,8 @@ class ModelGenerator {
   }
 
   Hint? _hintForPath(String path) {
-    final hint = this.hints
+    final hint = this
+        .hints
         .firstWhere((h) => h.path == path, orElse: () => Hint("", ""));
     if (hint.path == "") {
       return null;
@@ -52,7 +53,6 @@ class ModelGenerator {
     String prefix = "",
     String suffix = "",
   }) {
-
     List<Warning> warnings = <Warning>[];
     if (jsonRawDynamicData is List) {
       // if first element is an array, start in the first element.
@@ -87,8 +87,8 @@ class ModelGenerator {
         if (typeDef.name == 'Class') {
           typeDef.name = camelCase(key);
           typeDef.name = typeDef.name.padding(
-              prefix: prefix,
-              suffix: suffix,
+            prefix: prefix,
+            suffix: suffix,
           );
           // print("typeDef.name:${typeDef.name}");
         }
@@ -166,7 +166,11 @@ class ModelGenerator {
   /// in a single string. The [rawJson] param is assumed to be a properly
   /// formatted JSON string. The dart code is not validated so invalid dart code
   /// might be returned
-  DartCode generateUnsafeDart(String rawJson, {String classPrefix = "", String classSuffix = ""}) {
+  DartCode generateUnsafeDart({
+    required String rawJson,
+    String classPrefix = "",
+    String classSuffix = "",
+  }) {
     final jsonRawData = decodeJSON(rawJson);
     final astNode = parse(rawJson, Settings());
     List<Warning> warnings = _generateClassDefinition(
@@ -189,17 +193,24 @@ class ModelGenerator {
         }
       });
     });
-    return DartCode(
-        allClasses.map((c) => c.toString()).join('\n'), warnings);
+    return DartCode(allClasses.map((c) => c.toString()).join('\n'), warnings);
   }
 
   /// generateDartClasses will generate all classes and append one after another
   /// in a single string. The [rawJson] param is assumed to be a properly
   /// formatted JSON string. If the generated dart is invalid it will throw an error.
-  DartCode generateDartClasses(String rawJson, {String classPrefix = "", String classSuffix = ""}) {
-    final unsafeDartCode = generateUnsafeDart(rawJson, classPrefix: classPrefix, classSuffix: classSuffix);
+  DartCode generateDartClasses({
+    required String rawJson,
+    String classPrefix = "",
+    String classSuffix = "",
+  }) {
+    final unsafeDartCode = generateUnsafeDart(
+      rawJson: rawJson,
+      classPrefix: classPrefix,
+      classSuffix: classSuffix,
+    );
     final formatter = DartFormatter();
-    return DartCode(
-        formatter.format(unsafeDartCode.code), unsafeDartCode.warnings);
+    return DartCode(formatter.format(unsafeDartCode.code),
+        unsafeDartCode.warnings);
   }
 }

@@ -102,7 +102,12 @@ class TypeDefinition {
     return '$expression.toJson()';
   }
 
-  String jsonParseExpression(String key, bool privateField, {String prefix = "", String suffix = "",}) {
+  String jsonParseExpression(
+    String key,
+    bool privateField, {
+    String prefix = "",
+    String suffix = "",
+  }) {
     final jsonKey = "json['$key']";
     final fieldKey =
         fixFieldName(key, typeDef: this, privateField: privateField);
@@ -112,24 +117,26 @@ class TypeDefinition {
         return "$fieldKey = List<$subtype>.from(json['$key'] ?? []);";
       }
       return "$fieldKey = json['$key'];";
-    }
-    else if (name == "List" && subtype == "DateTime") {
+    } else if (name == "List" && subtype == "DateTime") {
       return "$fieldKey = json['$key'].map((v) => DateTime.tryParse(v));";
-    }
-    else if (name == "DateTime") {
+    } else if (name == "DateTime") {
       return "$fieldKey = DateTime.tryParse(json['$key']);";
-    }
-    else if (name == 'List') {
+    } else if (name == 'List') {
       // return "if (json['$key'] != null) {\n\t\t\t$fieldKey = <$subtype>[];\n\t\t\tjson['$key'].forEach((v) { $fieldKey!.add($subtype.fromJson(v)); });\n\t\t}";
       if (!_isPrimitive) {
         if (subtype != "Null") {
-          subtype = (subtype ?? "").padding(prefix: prefix, suffix: suffix,);
+          subtype = (subtype ?? "").padding(
+            prefix: prefix,
+            suffix: suffix,
+          );
         }
       }
       return "if (json['$key'] != null) {\n\t\t\tfinal array = (json['$key'] as List).map((e) => $subtype.fromJson(e));\n\t\t\t$fieldKey = List<$subtype>.from(array);\n\t\t}";
     } else {
       // class
-      final fromJsonDesc = _buildParseClass(jsonKey,);
+      final fromJsonDesc = _buildParseClass(
+        jsonKey,
+      );
       return "$fieldKey = json['$key'] != null ? ${fromJsonDesc} : null;";
     }
   }
@@ -179,7 +186,6 @@ class ClassDefinition {
   final String prefix;
   final String suffix;
 
-
   final Map<String, TypeDefinition> fields = Map<String, TypeDefinition>();
 
   List<Dependency> get dependencies {
@@ -193,7 +199,6 @@ class ClassDefinition {
     });
     return dependenciesList;
   }
-
 
   bool operator ==(other) {
     if (other is ClassDefinition) {
@@ -324,7 +329,9 @@ class ClassDefinition {
     sb.write('.fromJson(Map<String, dynamic>? json) {\n');
     sb.write('\tif (json == null) {\n\treturn;\n}\n');
     fields.keys.forEach((k) {
-      sb.write('\t\t${fields[k]!.jsonParseExpression(k, privateFields,
+      sb.write('\t\t${fields[k]!.jsonParseExpression(
+        k,
+        privateFields,
         prefix: prefix,
         suffix: suffix,
       )}\n');
@@ -340,7 +347,8 @@ class ClassDefinition {
     sb.write(
         '\tMap<String, dynamic> toJson() {\n\t\tfinal $mapKey = <String, dynamic>{};\n');
     fields.keys.forEach((k) {
-      sb.write('\t\t${fields[k]!.toJsonExpression(k, privateFields, mapKey)}\n');
+      sb.write(
+          '\t\t${fields[k]!.toJsonExpression(k, privateFields, mapKey)}\n');
     });
     sb.write('\t\treturn $mapKey;\n');
     sb.write('\t}');

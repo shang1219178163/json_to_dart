@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:json_to_dart/model_generator.dart';
 import "package:path/path.dart" show dirname, join, normalize;
 
-
 String _scriptPath() {
   var script = Platform.script.toString();
   if (script.startsWith("file://")) {
@@ -18,8 +17,8 @@ main() {
   var rootClassName = 'Sample';
   var jsonFile = 'sample.json';
 
-  // rootClassName = 'AppDetail';
-  // jsonFile = 'appInfo.json';
+  rootClassName = 'AppDetail';
+  jsonFile = 'appInfo.json';
 
   final classGenerator = ModelGenerator(rootClassName);
   final currentDirectory = dirname(_scriptPath());
@@ -27,8 +26,10 @@ main() {
   print("currentDirectory: $currentDirectory");
   print("filePath: $filePath");
   final jsonRawData = File(filePath).readAsStringSync();
-  DartCode dartCode = classGenerator.generateDartClasses(jsonRawData,
-    classPrefix: "YY", classSuffix: "Model",
+  DartCode dartCode = classGenerator.generateDartClasses(
+    rawJson: jsonRawData,
+    classPrefix: "YY",
+    classSuffix: "Model",
   );
   print("\n");
   print(dartCode.code);

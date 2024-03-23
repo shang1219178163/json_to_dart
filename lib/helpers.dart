@@ -205,23 +205,17 @@ String fixFieldName(String name,
 String getTypeName(dynamic obj) {
   if (obj is String) {
     return 'String';
-  }
-  else if (obj is int) {
+  } else if (obj is int) {
     return 'int';
-  }
-  else if (obj is double) {
+  } else if (obj is double) {
     return 'double';
-  }
-  else if (obj is bool) {
+  } else if (obj is bool) {
     return 'bool';
-  }
-  else if (obj == null) {
+  } else if (obj == null) {
     return 'Null';
-  }
-  else if (obj is List) {
+  } else if (obj is List) {
     return 'List';
-  }
-  else {
+  } else {
     // assumed class
     return 'Class';
   }
