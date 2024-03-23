@@ -9,7 +9,7 @@ void main() {
       final jsonRawData =
           new File("test_resources/bug_40.json").readAsStringSync();
       final generator = ModelGenerator('BugForty');
-      final dartCode = generator.generateDartClasses(jsonRawData);
+      final dartCode = generator.generateDartClasses(rawJson: jsonRawData);
       expect(dartCode.warnings.length, equals(1));
       expect(dartCode.warnings[0].warning, equals("list is empty"));
       expect(dartCode.warnings[0].path, equals("/CustomButtons"));

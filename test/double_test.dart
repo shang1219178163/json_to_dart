@@ -35,7 +35,7 @@ void main() {
       final jsonRawData =
           new File("test_resources/double.json").readAsStringSync();
       final modelGenerator = ModelGenerator('DoubleTest');
-      final dartSourceCode = modelGenerator.generateDartClasses(jsonRawData);
+      final dartSourceCode = modelGenerator.generateDartClasses(rawJson: jsonRawData);
       final wrongDoubleRegExp = RegExp(r"^.*double int[0-9]+;$");
       final wrongIntRegExp = RegExp(r"^.*int double[0-9]+;$");
       final wrongDoubleMatch =

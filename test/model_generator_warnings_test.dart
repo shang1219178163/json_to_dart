@@ -8,7 +8,7 @@ void main() {
       final jsonRawData =
           new File("test_resources/test_warnings.json").readAsStringSync();
       final ModelGenerator modelGenerator = new ModelGenerator("Warnings");
-      DartCode dartCode = modelGenerator.generateUnsafeDart(jsonRawData);
+      DartCode dartCode = modelGenerator.generateUnsafeDart(rawJson: jsonRawData);
       expect(dartCode.warnings, isNot(null));
       expect(dartCode.warnings.length, equals(4));
       expect(dartCode.warnings[0].warning, equals("list is ambiguous"));

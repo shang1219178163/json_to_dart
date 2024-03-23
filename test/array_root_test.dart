@@ -9,7 +9,7 @@ void main() {
       final jsonRawData =
           new File("test_resources/array_root.json").readAsStringSync();
       final generator = ModelGenerator('ArrayRoot');
-      final dartCode = generator.generateDartClasses(jsonRawData);
+      final dartCode = generator.generateDartClasses(rawJson: jsonRawData);
       expect(dartCode.warnings.length, equals(0));
       expect(dartCode.code.contains('class GlossDiv'), equals(true));
     });

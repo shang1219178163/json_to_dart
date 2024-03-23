@@ -11,7 +11,7 @@ void main() {
       final jsonRawData =
           new File("test_resources/bug_10.json").readAsStringSync();
       final generator = ModelGenerator('BugTen');
-      final dartCode = generator.generateDartClasses(jsonRawData);
+      final dartCode = generator.generateDartClasses(rawJson: jsonRawData);
       expect(dartCode.warnings.length, equals(0));
       expect(dartCode.code.contains('class GlossDiv'), equals(true));
     });
