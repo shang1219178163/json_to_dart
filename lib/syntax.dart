@@ -279,8 +279,8 @@ class ClassDefinition {
   String get _defaultPrivateConstructor {
     final sb = StringBuffer();
     sb.write('\t$name({\n');
-    var i = 0;
-    var len = fields.keys.length - 1;
+    // var i = 0;
+    // var len = fields.keys.length - 1;
     fields.keys.forEach((key) {
       final f = fields[key]!;
       final publicFieldName =
@@ -290,7 +290,7 @@ class ClassDefinition {
       // if (i != len) {
       //   sb.write(',\n');
       // }
-      i++;
+      // i++;
     });
     sb.write('}) {\n\n');
     fields.keys.forEach((key) {
@@ -310,7 +310,7 @@ class ClassDefinition {
   String get _defaultConstructor {
     final sb = StringBuffer();
     sb.write('\t$name({\n');
-    var i = 0;
+    // var i = 0;
     // var len = fields.keys.length - 1;
     fields.keys.forEach((key) {
       final f = fields[key]!;
@@ -320,7 +320,7 @@ class ClassDefinition {
       // if (i != len) {
       //   sb.write(', ');
       // }
-      i++;
+      // i++;
     });
     sb.write('});');
     return sb.toString();

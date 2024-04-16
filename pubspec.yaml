@@ -3,7 +3,7 @@ version: 1.0.6
 description: A library that generates Dart classes (parse and generator included) from a json string.
 homepage: https://github.com/javiercbk/json_to_dart
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=2.12.0 <4.0.0"
 dependencies:
   json_ast: "^1.0.6"
   convert: "^3.0.1"
