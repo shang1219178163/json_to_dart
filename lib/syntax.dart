@@ -116,6 +116,9 @@ class TypeDefinition {
         // return "$fieldKey = json['$key'].cast<$subtype>();";
         return "$fieldKey = List<$subtype>.from(json['$key'] ?? []);";
       }
+      if (name.isNotEmpty) {
+        return "$fieldKey = (json['$key'] as $name?);";
+      }
       return "$fieldKey = json['$key'];";
     } else if (name == "List" && subtype == "DateTime") {
       return "$fieldKey = json['$key'].map((v) => DateTime.tryParse(v));";
