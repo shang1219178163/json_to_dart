@@ -30,6 +30,7 @@ main() {
     rawJson: jsonRawData,
     classPrefix: "YY",
     classSuffix: "Model",
+    hasCopyWithFunc: true,
   );
   print("\n");
   print(dartCode.code);

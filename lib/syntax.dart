@@ -180,12 +180,14 @@ class ClassDefinition {
   ClassDefinition({
     required this.name,
     this.privateFields = false,
+    this.hasCopyWithFunc = true,
     this.prefix = "",
     this.suffix = "",
   });
 
   final String name;
   final bool privateFields;
+  final bool hasCopyWithFunc;
   final String prefix;
   final String suffix;
 
@@ -326,6 +328,35 @@ class ClassDefinition {
     return sb.toString();
   }
 
+  /// CopyWith
+  String get _jsonGenFunCopyWith {
+    if (!hasCopyWithFunc) {
+      return "";
+    }
+    final sb = StringBuffer();
+    sb.write('\t$name copyWith({\n');
+    fields.keys.forEach((key) {
+      final f = fields[key]!;
+      final fieldName =
+          fixFieldName(key, typeDef: f, privateField: privateFields);
+      if (f.name == "List" && f.subtype?.isNotEmpty == true) {
+        sb.write('${f.name}<${f.subtype}>? $fieldName, \n');
+      } else {
+        sb.write('${f.name}? $fieldName, \n');
+      }
+    });
+    sb.write('}) {');
+    sb.write('\treturn $name(');
+    fields.keys.forEach((key) {
+      final f = fields[key]!;
+      final fieldName =
+          fixFieldName(key, typeDef: f, privateField: privateFields);
+      sb.write('$fieldName: $fieldName ?? this.$fieldName,\n');
+    });
+    sb.write(');}');
+    return sb.toString();
+  }
+
   String get _jsonParseFunc {
     final sb = StringBuffer();
     sb.write('\t$name');
@@ -360,9 +391,34 @@ class ClassDefinition {
 
   String toString() {
     if (privateFields) {
-      return '\nclass $name {\n\n$_defaultPrivateConstructor\n\n$_fieldList\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return [
+        "class $name {",
+        "$_defaultPrivateConstructor",
+        "$_fieldList",
+        "$_gettersSetters",
+        "$_jsonGenFunCopyWith",
+        "$_jsonParseFunc",
+        "$_jsonGenFunc",
+        "}",
+      ].where((e) => e.isNotEmpty).join("\n\n");
     } else {
-      return '\nclass $name {\n\n$_defaultConstructor\n\n$_fieldList\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return [
+        "class $name {",
+        "$_defaultConstructor",
+        "$_fieldList",
+        "$_jsonGenFunCopyWith",
+        "$_jsonParseFunc",
+        "$_jsonGenFunc",
+        "}",
+      ].where((e) => e.isNotEmpty).join("\n\n");
     }
   }
+
+  // String toString() {
+  //   if (privateFields) {
+  //     return '\nclass $name {\n\n$_defaultPrivateConstructor\n\n$_fieldList\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+  //   } else {
+  //     return '\nclass $name {\n\n$_defaultConstructor\n\n$_fieldList\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+  //   }
+  // }
 }

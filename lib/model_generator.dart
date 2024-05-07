@@ -52,6 +52,7 @@ class ModelGenerator {
     required Node? astNode,
     String prefix = "",
     String suffix = "",
+    bool hasCopyWithFunc = true,
   }) {
     List<Warning> warnings = <Warning>[];
     if (jsonRawDynamicData is List) {
@@ -64,6 +65,7 @@ class ModelGenerator {
         astNode: node!,
         prefix: prefix,
         suffix: suffix,
+        hasCopyWithFunc: hasCopyWithFunc,
       );
     } else {
       final Map<dynamic, dynamic> jsonRawData = jsonRawDynamicData;
@@ -72,6 +74,7 @@ class ModelGenerator {
         // name: className,
         name: "$prefix$className$suffix",
         privateFields: _privateFields,
+        hasCopyWithFunc: hasCopyWithFunc,
         prefix: prefix,
         suffix: suffix,
       );
@@ -170,6 +173,7 @@ class ModelGenerator {
     required String rawJson,
     String classPrefix = "",
     String classSuffix = "",
+    bool hasCopyWithFunc = true,
   }) {
     final jsonRawData = decodeJSON(rawJson);
     final astNode = parse(rawJson, Settings());
@@ -180,6 +184,7 @@ class ModelGenerator {
       astNode: astNode,
       prefix: classPrefix,
       suffix: classSuffix,
+      hasCopyWithFunc: hasCopyWithFunc,
     );
     // after generating all classes, replace the omited similar classes.
     allClasses.forEach((c) {
@@ -203,14 +208,16 @@ class ModelGenerator {
     required String rawJson,
     String classPrefix = "",
     String classSuffix = "",
+    bool hasCopyWithFunc = true,
   }) {
     final unsafeDartCode = generateUnsafeDart(
       rawJson: rawJson,
       classPrefix: classPrefix,
       classSuffix: classSuffix,
+      hasCopyWithFunc: hasCopyWithFunc,
     );
     final formatter = DartFormatter();
-    return DartCode(formatter.format(unsafeDartCode.code),
-        unsafeDartCode.warnings);
+    return DartCode(
+        formatter.format(unsafeDartCode.code), unsafeDartCode.warnings);
   }
 }
