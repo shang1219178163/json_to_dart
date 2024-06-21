@@ -146,6 +146,7 @@ class ModelGenerator {
               astNode: node,
               prefix: prefix,
               suffix: suffix,
+              hasCopyWithFunc: hasCopyWithFunc,
             );
           }
         } else {
@@ -157,6 +158,7 @@ class ModelGenerator {
             astNode: node,
             prefix: prefix,
             suffix: suffix,
+            hasCopyWithFunc: hasCopyWithFunc,
           );
         }
         warnings.addAll(warns);
