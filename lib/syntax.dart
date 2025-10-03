@@ -116,7 +116,7 @@ class TypeDefinition {
       }
       if (name.isNotEmpty) {
         if (hasTypeConversion) {
-          return "$fieldKey = (json['$key'] as $name?);";
+          return "$fieldKey = json['$key'] as $name?;";
         }
         return "$fieldKey = json['$key'];";
       }
