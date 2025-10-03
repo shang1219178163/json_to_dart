@@ -74,9 +74,9 @@ class ModelGenerator {
         // name: className,
         name: "$prefix$className$suffix",
         privateFields: _privateFields,
-        hasCopyWithFunc: hasCopyWithFunc,
         prefix: prefix,
         suffix: suffix,
+        hasCopyWithFunc: hasCopyWithFunc,
         hasTypeConversion: hasTypeConversion,
       );
       keys.forEach((key) {
@@ -190,6 +190,7 @@ class ModelGenerator {
       astNode: astNode,
       prefix: classPrefix,
       suffix: classSuffix,
+      hasCopyWithFunc: hasCopyWithFunc,
       hasTypeConversion: hasTypeConversion,
     );
     // after generating all classes, replace the omited similar classes.
