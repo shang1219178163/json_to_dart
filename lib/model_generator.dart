@@ -36,9 +36,7 @@ class ModelGenerator {
   }
 
   Hint? _hintForPath(String path) {
-    final hint = this
-        .hints
-        .firstWhere((h) => h.path == path, orElse: () => Hint("", ""));
+    final hint = this.hints.firstWhere((h) => h.path == path, orElse: () => Hint("", ""));
     if (hint.path == "") {
       return null;
     }
@@ -53,6 +51,7 @@ class ModelGenerator {
     String prefix = "",
     String suffix = "",
     bool hasCopyWithFunc = true,
+    bool hasTypeConversion = false,
   }) {
     List<Warning> warnings = <Warning>[];
     if (jsonRawDynamicData is List) {
@@ -66,6 +65,7 @@ class ModelGenerator {
         prefix: prefix,
         suffix: suffix,
         hasCopyWithFunc: hasCopyWithFunc,
+        hasTypeConversion: hasTypeConversion,
       );
     } else {
       final Map<dynamic, dynamic> jsonRawData = jsonRawDynamicData;
@@ -77,6 +77,7 @@ class ModelGenerator {
         hasCopyWithFunc: hasCopyWithFunc,
         prefix: prefix,
         suffix: suffix,
+        hasTypeConversion: hasTypeConversion,
       );
       keys.forEach((key) {
         TypeDefinition typeDef;
@@ -112,8 +113,8 @@ class ModelGenerator {
         }
         classDefinition.addField(key, typeDef);
       });
-      final similarClass = allClasses.firstWhere((cd) => cd == classDefinition,
-          orElse: () => ClassDefinition(name: ""));
+      final similarClass =
+          allClasses.firstWhere((cd) => cd == classDefinition, orElse: () => ClassDefinition(name: ""));
       if (similarClass.name != "") {
         final similarClassName = similarClass.name;
         final currentClassName = classDefinition.name;
@@ -131,8 +132,8 @@ class ModelGenerator {
             // into a single one
             dynamic toAnalyze;
             if (!dependency.typeDef.isAmbiguous) {
-              WithWarning<Map> mergeWithWarning = mergeObjectList(
-                  jsonRawData[dependency.name], '$path/${dependency.name}');
+              WithWarning<Map> mergeWithWarning =
+                  mergeObjectList(jsonRawData[dependency.name], '$path/${dependency.name}');
               toAnalyze = mergeWithWarning.result;
               warnings.addAll(mergeWithWarning.warnings);
             } else {
@@ -147,6 +148,7 @@ class ModelGenerator {
               prefix: prefix,
               suffix: suffix,
               hasCopyWithFunc: hasCopyWithFunc,
+              hasTypeConversion: hasTypeConversion,
             );
           }
         } else {
@@ -159,6 +161,7 @@ class ModelGenerator {
             prefix: prefix,
             suffix: suffix,
             hasCopyWithFunc: hasCopyWithFunc,
+            hasTypeConversion: hasTypeConversion,
           );
         }
         warnings.addAll(warns);
@@ -176,6 +179,7 @@ class ModelGenerator {
     String classPrefix = "",
     String classSuffix = "",
     bool hasCopyWithFunc = true,
+    bool hasTypeConversion = true,
   }) {
     final jsonRawData = decodeJSON(rawJson);
     final astNode = parse(rawJson, Settings());
@@ -186,7 +190,7 @@ class ModelGenerator {
       astNode: astNode,
       prefix: classPrefix,
       suffix: classSuffix,
-      hasCopyWithFunc: hasCopyWithFunc,
+      hasTypeConversion: hasTypeConversion,
     );
     // after generating all classes, replace the omited similar classes.
     allClasses.forEach((c) {
@@ -211,15 +215,16 @@ class ModelGenerator {
     String classPrefix = "",
     String classSuffix = "",
     bool hasCopyWithFunc = true,
+    bool hasTypeConversion = true,
   }) {
     final unsafeDartCode = generateUnsafeDart(
       rawJson: rawJson,
       classPrefix: classPrefix,
       classSuffix: classSuffix,
       hasCopyWithFunc: hasCopyWithFunc,
+      hasTypeConversion: hasTypeConversion,
     );
     final formatter = DartFormatter();
-    return DartCode(
-        formatter.format(unsafeDartCode.code), unsafeDartCode.warnings);
+    return DartCode(formatter.format(unsafeDartCode.code), unsafeDartCode.warnings);
   }
 }

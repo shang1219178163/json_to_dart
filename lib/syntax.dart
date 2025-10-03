@@ -358,6 +358,7 @@ class ClassDefinition {
         privateFields,
         prefix: prefix,
         suffix: suffix,
+        hasTypeConversion: hasTypeConversion,
       )}\n');
     });
     sb.write('\t}');
