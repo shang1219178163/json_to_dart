@@ -33,8 +33,16 @@ main() {
       classPrefix: "YY",
       classSuffix: "Model",
       hasCopyWithFunc: true,
-      onMore: (body) {
+      onMore: (body, classes) {
+        final copyRights = """
+//  ${classes.first.name}.dart
+//
+//  Created by JsonToModel on 2025/10/12 10:03.
+//
+""";
+
         var result = [
+          copyRights,
           "import 'package:equatable/equatable.dart';",
           body,
         ].join("\n");

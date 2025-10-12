@@ -189,7 +189,7 @@ class ModelGenerator {
     bool hasCopyWithFunc = true,
     bool hasTypeConversion = true,
     ClassConvertType? onConvert,
-    String Function(String content)? onMore,
+    String Function(String content, List<ClassDefinition> classes)? onMore,
   }) {
     final jsonRawData = decodeJSON(rawJson);
     final astNode = parse(rawJson, Settings());
@@ -218,7 +218,7 @@ class ModelGenerator {
     });
 
     var content = allClasses.map((c) => c.toString()).join('\n');
-    content = onMore?.call(content) ?? content;
+    content = onMore?.call(content, allClasses) ?? content;
     return DartCode(content, warnings);
   }
 
@@ -232,7 +232,7 @@ class ModelGenerator {
     bool hasCopyWithFunc = true,
     bool hasTypeConversion = true,
     ClassConvertType? onConvert,
-    String Function(String content)? onMore,
+    String Function(String content, List<ClassDefinition> classes)? onMore,
   }) {
     final unsafeDartCode = generateUnsafeDart(
       rawJson: rawJson,
