@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:json_to_dart/model_generator.dart';
 import "package:path/path.dart" show dirname, join, normalize;
 
+import 'string_ext.dart';
+
 String _scriptPath() {
   var script = Platform.script.toString();
   if (script.startsWith("file://")) {
@@ -17,8 +19,8 @@ main() {
   var rootClassName = 'Sample';
   var jsonFile = 'sample.json';
 
-  rootClassName = 'AppDetail';
-  jsonFile = 'appInfo.json';
+  // rootClassName = 'AppDetail';
+  // jsonFile = 'appInfo.json';
 
   final classGenerator = ModelGenerator(rootClassName);
   final currentDirectory = dirname(_scriptPath());
@@ -27,11 +29,35 @@ main() {
   print("filePath: $filePath");
   final jsonRawData = File(filePath).readAsStringSync();
   DartCode dartCode = classGenerator.generateDartClasses(
-    rawJson: jsonRawData,
-    classPrefix: "YY",
-    classSuffix: "Model",
-    hasCopyWithFunc: true,
-  );
+      rawJson: jsonRawData,
+      classPrefix: "YY",
+      classSuffix: "Model",
+      hasCopyWithFunc: true,
+      onMore: (body) {
+        var result = [
+          "import 'package:equatable/equatable.dart';",
+          body,
+        ].join("\n");
+        return result;
+      },
+      onConvert: (body, cls) {
+        var result = body.replaceFirst("class ${cls.name}", "class ${cls.name} extends Equatable");
+
+        final from = "${cls.name}.fromJson(Map<String, dynamic> json) {";
+        final to = """
+   @override
+  List<Object> get props => ${cls.fields.keys.map(
+                  (e) => e.toCamlCase("_", isUpper: false),
+                ).toList()}.where((e) => e
+   != null)
+  .whereType<Object>().toList();
+ 
+ $from
+  """;
+
+        result = result.replaceFirst(from, to);
+        return result;
+      });
   print("\n");
   print(dartCode.code);
 }

@@ -1,3 +1,4 @@
+
 import 'package:json_ast/json_ast.dart' show Node;
 import 'package:json_to_dart/helpers.dart';
 import 'package:json_to_dart/string_ext.dart';
@@ -5,6 +6,8 @@ import 'package:json_to_dart/string_ext.dart';
 const String emptyListWarn = "list is empty";
 const String ambiguousListWarn = "list is ambiguous";
 const String ambiguousTypeWarn = "type is ambiguous";
+
+typedef ClassConvertType = String Function(String clsContent, ClassDefinition cls);
 
 class Warning {
   final String warning;
@@ -112,7 +115,7 @@ class TypeDefinition {
     if (isPrimitive) {
       if (name == "List") {
         // return "$fieldKey = json['$key'].cast<$subtype>();";
-        return "$fieldKey = List<$subtype>.from(json['$key'] ?? <$subtype>[]);";
+        return "$fieldKey = List<$subtype>.from(json['$key'] as List<$subtype>? ?? <$subtype>[]);";
       }
       if (name.isNotEmpty) {
         if (hasTypeConversion) {
@@ -135,11 +138,11 @@ class TypeDefinition {
           );
         }
       }
-      return "if (json['$key'] != null) {\n\t\t\tfinal array = (json['$key'] as List).map((e) => $subtype.fromJson(e));\n\t\t\t$fieldKey = List<$subtype>.from(array);\n\t\t}";
+      return "if (json['$key'] != null) {\n\t\t\tfinal array = (json['$key'] as List<Map<String, dynamic>>).map((e) => $subtype.fromJson(e));\n\t\t\t$fieldKey = List<$subtype>.from(array);\n\t\t}";
     } else {
       // class
       final fromJsonDesc = _buildParseClass(
-        jsonKey,
+        "$jsonKey as Map<String, dynamic>",
       );
       return "$fieldKey = json['$key'] != null ? ${fromJsonDesc} : null;";
     }
@@ -182,6 +185,7 @@ class ClassDefinition {
     this.prefix = "",
     this.suffix = "",
     this.hasTypeConversion = false,
+    this.onConvert,
   });
 
   final String name;
@@ -194,6 +198,9 @@ class ClassDefinition {
   final bool hasTypeConversion;
 
   final Map<String, TypeDefinition> fields = Map<String, TypeDefinition>();
+
+  /// 转换
+  final ClassConvertType? onConvert;
 
   List<Dependency> get dependencies {
     final dependenciesList = <Dependency>[];
@@ -379,28 +386,27 @@ class ClassDefinition {
   }
 
   String toString() {
-    if (privateFields) {
-      return [
-        "class $name {",
-        "$_defaultPrivateConstructor",
-        "$_fieldList",
-        "$_gettersSetters",
-        "$_jsonGenFunCopyWith",
-        "$_jsonParseFunc",
-        "$_jsonGenFunc",
-        "}",
-      ].where((e) => e.isNotEmpty).join("\n\n");
-    } else {
-      return [
-        "class $name {",
-        "$_defaultConstructor",
-        "$_fieldList",
-        "$_jsonGenFunCopyWith",
-        "$_jsonParseFunc",
-        "$_jsonGenFunc",
-        "}",
-      ].where((e) => e.isNotEmpty).join("\n\n");
-    }
+    final result = privateFields
+        ? [
+            "class $name {",
+            "$_defaultPrivateConstructor",
+            "$_fieldList",
+            "$_gettersSetters",
+            "$_jsonGenFunCopyWith",
+            "$_jsonParseFunc",
+            "$_jsonGenFunc",
+            "}",
+          ].where((e) => e.isNotEmpty).join("\n\n")
+        : [
+            "class $name {",
+            "$_defaultConstructor",
+            "$_fieldList",
+            "$_jsonGenFunCopyWith",
+            "$_jsonParseFunc",
+            "$_jsonGenFunc",
+            "}",
+          ].where((e) => e.isNotEmpty).join("\n\n");
+    return onConvert?.call(result, this) ?? result;
   }
 
   // String toString() {

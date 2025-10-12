@@ -52,6 +52,7 @@ class ModelGenerator {
     String suffix = "",
     bool hasCopyWithFunc = true,
     bool hasTypeConversion = false,
+    ClassConvertType? onConvert,
   }) {
     List<Warning> warnings = <Warning>[];
     if (jsonRawDynamicData is List) {
@@ -66,6 +67,7 @@ class ModelGenerator {
         suffix: suffix,
         hasCopyWithFunc: hasCopyWithFunc,
         hasTypeConversion: hasTypeConversion,
+        onConvert: onConvert,
       );
     } else {
       final Map<dynamic, dynamic> jsonRawData = jsonRawDynamicData;
@@ -78,6 +80,7 @@ class ModelGenerator {
         suffix: suffix,
         hasCopyWithFunc: hasCopyWithFunc,
         hasTypeConversion: hasTypeConversion,
+        onConvert: onConvert,
       );
       keys.forEach((key) {
         TypeDefinition typeDef;
@@ -113,8 +116,11 @@ class ModelGenerator {
         }
         classDefinition.addField(key, typeDef);
       });
-      final similarClass =
-          allClasses.firstWhere((cd) => cd == classDefinition, orElse: () => ClassDefinition(name: ""));
+      final similarClass = allClasses.firstWhere((cd) => cd == classDefinition,
+          orElse: () => ClassDefinition(
+                name: "",
+                onConvert: onConvert,
+              ));
       if (similarClass.name != "") {
         final similarClassName = similarClass.name;
         final currentClassName = classDefinition.name;
@@ -149,6 +155,7 @@ class ModelGenerator {
               suffix: suffix,
               hasCopyWithFunc: hasCopyWithFunc,
               hasTypeConversion: hasTypeConversion,
+              onConvert: onConvert,
             );
           }
         } else {
@@ -162,6 +169,7 @@ class ModelGenerator {
             suffix: suffix,
             hasCopyWithFunc: hasCopyWithFunc,
             hasTypeConversion: hasTypeConversion,
+            onConvert: onConvert,
           );
         }
         warnings.addAll(warns);
@@ -180,6 +188,8 @@ class ModelGenerator {
     String classSuffix = "",
     bool hasCopyWithFunc = true,
     bool hasTypeConversion = true,
+    ClassConvertType? onConvert,
+    String Function(String content)? onMore,
   }) {
     final jsonRawData = decodeJSON(rawJson);
     final astNode = parse(rawJson, Settings());
@@ -192,6 +202,7 @@ class ModelGenerator {
       suffix: classSuffix,
       hasCopyWithFunc: hasCopyWithFunc,
       hasTypeConversion: hasTypeConversion,
+      onConvert: onConvert,
     );
     // after generating all classes, replace the omited similar classes.
     allClasses.forEach((c) {
@@ -205,7 +216,10 @@ class ModelGenerator {
         }
       });
     });
-    return DartCode(allClasses.map((c) => c.toString()).join('\n'), warnings);
+
+    var content = allClasses.map((c) => c.toString()).join('\n');
+    content = onMore?.call(content) ?? content;
+    return DartCode(content, warnings);
   }
 
   /// generateDartClasses will generate all classes and append one after another
@@ -217,6 +231,8 @@ class ModelGenerator {
     String classSuffix = "",
     bool hasCopyWithFunc = true,
     bool hasTypeConversion = true,
+    ClassConvertType? onConvert,
+    String Function(String content)? onMore,
   }) {
     final unsafeDartCode = generateUnsafeDart(
       rawJson: rawJson,
@@ -224,6 +240,8 @@ class ModelGenerator {
       classSuffix: classSuffix,
       hasCopyWithFunc: hasCopyWithFunc,
       hasTypeConversion: hasTypeConversion,
+      onConvert: onConvert,
+      onMore: onMore,
     );
     final formatter = DartFormatter();
     return DartCode(formatter.format(unsafeDartCode.code), unsafeDartCode.warnings);

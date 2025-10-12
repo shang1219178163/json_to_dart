@@ -18,6 +18,11 @@ main() {
   final currentDirectory = dirname(_scriptPath());
   final filePath = normalize(join(currentDirectory, 'sample.json'));
   final jsonRawData = new File(filePath).readAsStringSync();
-  DartCode? dartCode = classGenerator.generateDartClasses(rawJson: jsonRawData);
+  DartCode? dartCode = classGenerator.generateDartClasses(
+    rawJson: jsonRawData,
+    onConvert: (body, cls) {
+      return body;
+    },
+  );
   print(dartCode?.code);
 }
