@@ -139,7 +139,7 @@ class TypeDefinition {
         }
       }
 
-      return "if (json['$key'] != null) {\n\t\t\tfinal array = List<Map<String, dynamic>>.from(json['packages'] ?? []);\n\t\t\t$fieldKey = array.map((e) => ProjectPackageModel.fromJson(e)).toList();\n\t\t}";
+      return "if (json['$key'] != null) {\n\t\t\tfinal array = List<Map<String, dynamic>>.from(json['$key'] ?? []);\n\t\t\t$fieldKey = array.map((e) => $subtype.fromJson(e)).toList();\n\t\t}";
       return "if (json['$key'] != null) {\n\t\t\tfinal array = (json['$key'] as List<Map<String, dynamic>>).map((e) => $subtype.fromJson(e));\n\t\t\t$fieldKey = List<$subtype>.from(array);\n\t\t}";
     } else {
       // class
