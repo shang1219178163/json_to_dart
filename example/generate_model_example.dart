@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:json_to_dart/model_generator.dart';
 import "package:path/path.dart" show dirname, join, normalize;
 
-import 'string_ext.dart';
-
 String _scriptPath() {
   var script = Platform.script.toString();
   if (script.startsWith("file://")) {
@@ -55,11 +53,7 @@ main() {
         final from = "${cls.name}.fromJson(Map<String, dynamic> json) {";
         final to = """
    @override
-  List<Object> get props => ${cls.fields.keys.map(
-                  (e) => e.toCamlCase("_", isUpper: false),
-                ).toList()}.where((e) => e
-   != null)
-  .whereType<Object>().toList();
+   List<Object?> get props => [...toJson().values];
  
  $from
   """;
