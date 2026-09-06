@@ -1,4 +1,3 @@
-
 import 'package:json_ast/json_ast.dart' show Node;
 import 'package:json_to_dart/helpers.dart';
 import 'package:json_to_dart/string_ext.dart';
@@ -98,7 +97,7 @@ class TypeDefinition {
 
   String _buildToJsonClass(String expression, [bool nullGuard = true]) {
     if (nullGuard) {
-      return '$expression!.toJson()';
+      return '$expression?.toJson()';
     }
     return '$expression.toJson()';
   }
@@ -163,9 +162,7 @@ class TypeDefinition {
       return """$mapKey['$key'] = $thisKey?.map((v) => ${_buildToJsonClass('v', false)}).toList();""";
     } else {
       // class
-      return """if ($thisKey != null) {
-      $mapKey['$key'] = ${_buildToJsonClass(thisKey)};
-    }""";
+      return "$mapKey['$key'] = ${_buildToJsonClass(thisKey)};";
     }
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:json_to_dart/model_generator.dart';
 import "package:path/path.dart" show dirname, join, normalize;
 
@@ -18,11 +19,11 @@ main() {
   final currentDirectory = dirname(_scriptPath());
   final filePath = normalize(join(currentDirectory, 'sample.json'));
   final jsonRawData = new File(filePath).readAsStringSync();
-  DartCode? dartCode = classGenerator.generateDartClasses(
+  final dartCode = classGenerator.generateDartClasses(
     rawJson: jsonRawData,
     onConvert: (body, cls) {
       return body;
     },
   );
-  print(dartCode?.code);
+  print(dartCode.code);
 }

@@ -11,6 +11,12 @@
     "firstName": "Javier",
     "lastName": "Lecuona",
     "location": "Buenos Aires, Argentina",
+    "address": {
+      "street": "123 Main St",
+      "city": "Anytown",
+      "state": "CA",
+      "zip": "12345"
+    },
     "phones": [
       {
         "type": "work",
